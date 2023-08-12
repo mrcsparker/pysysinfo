@@ -1,11 +1,12 @@
 use crate::py_component::PyComponent;
 use crate::py_cpu::PyCpu;
 use crate::py_disk::PyDisk;
+use crate::py_network::PyNetwork;
 use crate::py_user::PyUser;
 use pyo3::prelude::*;
 use rayon::prelude::*;
 use sysinfo::DiskExt;
-use sysinfo::{ComponentExt, CpuExt, System, SystemExt, UserExt};
+use sysinfo::{ComponentExt, CpuExt, NetworkExt, NetworksExt, System, SystemExt, UserExt};
 
 #[pyclass(name = "Sysinfo")]
 pub struct PySysinfo {
@@ -117,36 +118,43 @@ impl PySysinfo {
     // fn physical_core_count(&self) -> Option<usize>;
 
     /// Returns the RAM size in bytes.
+    #[getter]
     pub fn total_memory(&mut self) -> u64 {
         self.sys.total_memory()
     }
 
     /// Returns the amount of free RAM in bytes.
+    #[getter]
     pub fn free_memory(&mut self) -> u64 {
         self.sys.free_memory()
     }
 
     /// Returns the amount of available RAM in bytes.
+    #[getter]
     pub fn available_memory(&mut self) -> u64 {
         self.sys.available_memory()
     }
 
     /// Returns the amount of used RAM in bytes.
+    #[getter]
     pub fn used_memory(&mut self) -> u64 {
         self.sys.used_memory()
     }
 
     /// Returns the SWAP size in bytes.
+    #[getter]
     pub fn total_swap(&mut self) -> u64 {
         self.sys.total_swap()
     }
 
     /// Returns the amount of free SWAP in bytes.
+    #[getter]
     pub fn free_swap(&mut self) -> u64 {
         self.sys.free_swap()
     }
 
     /// Returns the amount of used SWAP in bytes.
+    #[getter]
     pub fn used_swap(&mut self) -> u64 {
         self.sys.free_swap()
     }
@@ -194,15 +202,37 @@ impl PySysinfo {
             .collect()
     }
 
-    // Returns the network interfaces object.
-    // fn networks(&self) -> &Networks;
+    /// Returns the network interfaces object.
+    pub fn networks(&mut self) -> Vec<PyNetwork> {
+        self.sys
+            .networks()
+            .iter()
+            .map(|(interface, network)| PyNetwork {
+                interface: interface.to_string(),
+                received: network.received(),
+                total_received: network.total_received(),
+                transmitted: network.transmitted(),
+                total_transmitted: network.total_transmitted(),
+                packets_received: network.packets_received(),
+                total_packets_received: network.total_packets_received(),
+                packets_transmitted: network.packets_transmitted(),
+                total_packets_transmitted: network.total_packets_transmitted(),
+                errors_on_received: network.errors_on_received(),
+                total_errors_on_received: network.total_errors_on_received(),
+                errors_on_transmitted: network.errors_on_transmitted(),
+                total_errors_on_transmitted: network.total_errors_on_transmitted(),
+            })
+            .collect()
+    }
 
     /// Returns system uptime (in seconds).
+    #[getter]
     pub fn uptime(&mut self) -> u64 {
         self.sys.uptime()
     }
 
     /// Returns the time (in seconds) when the system booted since UNIX epoch.
+    #[getter]
     pub fn boot_time(&mut self) -> u64 {
         self.sys.boot_time()
     }
@@ -211,31 +241,37 @@ impl PySysinfo {
     // fn load_average(&self) -> LoadAvg;
 
     /// Returns the system name.
+    #[getter]
     pub fn name(&mut self) -> Option<String> {
         self.sys.name()
     }
 
     /// Returns the system's kernel version.
+    #[getter]
     pub fn kernel_version(&mut self) -> Option<String> {
         self.sys.kernel_version()
     }
 
     /// Returns the system version (e.g. for MacOS this will return 11.1 rather than the kernel version).
+    #[getter]
     pub fn os_version(&mut self) -> Option<String> {
         self.sys.os_version()
     }
 
     /// Returns the system long os version (e.g "MacOS 11.2 BigSur").
+    #[getter]
     pub fn long_os_version(&mut self) -> Option<String> {
         self.sys.long_os_version()
     }
 
     /// Returns the distribution id as defined by os-release,
+    #[getter]
     pub fn distribution_id(&mut self) -> String {
         self.sys.distribution_id()
     }
 
     /// Returns the system hostname based off DNS
+    #[getter]
     pub fn host_name(&mut self) -> Option<String> {
         self.sys.host_name()
     }

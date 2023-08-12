@@ -1,6 +1,7 @@
 mod py_component;
 mod py_cpu;
 mod py_disk;
+mod py_network;
 mod py_sysinfo;
 mod py_user;
 
