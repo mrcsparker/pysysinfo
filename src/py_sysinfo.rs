@@ -115,7 +115,10 @@ impl PySysinfo {
     }
 
     // Returns the number of physical cores on the CPU or `None` if it couldn't get it.
-    // fn physical_core_count(&self) -> Option<usize>;
+    #[getter]
+    pub fn physical_core_count(&self) -> Option<usize> {
+        self.sys.physical_core_count()
+    }
 
     /// Returns the RAM size in bytes.
     #[getter]
@@ -238,7 +241,14 @@ impl PySysinfo {
     }
 
     // Returns the system load average value.
-    // fn load_average(&self) -> LoadAvg;
+    fn load_average(&self) -> PyLoadAvg {
+        let l = self.sys.load_average();
+        PyLoadAvg {
+            one: l.one(),
+            five: l.five(),
+            fifteen: l.fifteen(),
+        }
+    }
 
     /// Returns the system name.
     #[getter]
