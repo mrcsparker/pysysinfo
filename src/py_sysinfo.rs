@@ -1,6 +1,7 @@
 use crate::py_component::PyComponent;
 use crate::py_cpu::PyCpu;
 use crate::py_disk::PyDisk;
+use crate::py_load_avg::PyLoadAvg;
 use crate::py_network::PyNetwork;
 use crate::py_user::PyUser;
 use pyo3::prelude::*;
@@ -101,17 +102,7 @@ impl PySysinfo {
 
     /// Returns the list of the CPUs.
     pub fn cpus(&mut self) -> Vec<PyCpu> {
-        self.sys
-            .cpus()
-            .par_iter()
-            .map(|cpu| PyCpu {
-                cpu_usage: cpu.cpu_usage(),
-                name: cpu.name().to_string(),
-                vendor_id: cpu.vendor_id().to_string(),
-                brand: cpu.brand().to_string(),
-                frequency: cpu.frequency(),
-            })
-            .collect()
+        self.sys.cpus().par_iter().map(Into::into).collect()
     }
 
     // Returns the number of physical cores on the CPU or `None` if it couldn't get it.
@@ -164,45 +155,17 @@ impl PySysinfo {
 
     /// Returns the components list.
     pub fn components(&self) -> Vec<PyComponent> {
-        self.sys
-            .components()
-            .par_iter()
-            .map(|component| PyComponent {
-                temperature: component.temperature(),
-                max: component.max(),
-                critical: component.critical(),
-                label: component.label().to_string(),
-            })
-            .collect()
+        self.sys.components().par_iter().map(Into::into).collect()
     }
 
     /// Returns the users list.
     pub fn users(&mut self) -> Vec<PyUser> {
-        self.sys
-            .users()
-            .par_iter()
-            .map(|user| PyUser {
-                id: user.id().to_string(),
-                group_id: user.group_id().to_string(),
-                name: user.name().to_string(),
-                groups: user.groups().to_vec(),
-            })
-            .collect()
+        self.sys.users().par_iter().map(Into::into).collect()
     }
 
     /// Returns the disks list.
     pub fn disks(&mut self) -> Vec<PyDisk> {
-        self.sys
-            .disks()
-            .par_iter()
-            .map(|disk| PyDisk {
-                name: disk.name().to_str().unwrap_or("").to_string(),
-                mount_point: disk.mount_point().to_str().unwrap_or("").to_string(),
-                total_space: disk.total_space(),
-                available_space: disk.available_space(),
-                is_removable: disk.is_removable(),
-            })
-            .collect()
+        self.sys.disks().par_iter().map(Into::into).collect()
     }
 
     /// Returns the network interfaces object.
@@ -244,9 +207,9 @@ impl PySysinfo {
     fn load_average(&self) -> PyLoadAvg {
         let l = self.sys.load_average();
         PyLoadAvg {
-            one: l.one(),
-            five: l.five(),
-            fifteen: l.fifteen(),
+            one: l.one,
+            five: l.five,
+            fifteen: l.fifteen,
         }
     }
 

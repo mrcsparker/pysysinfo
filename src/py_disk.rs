@@ -1,4 +1,5 @@
 use pyo3::prelude::*;
+use sysinfo::DiskExt;
 
 #[pyclass(name = "Disk")]
 pub struct PyDisk {
@@ -16,6 +17,18 @@ pub struct PyDisk {
 
     #[pyo3(get)]
     pub is_removable: bool,
+}
+
+impl From<&sysinfo::Disk> for PyDisk {
+    fn from(disk: &sysinfo::Disk) -> Self {
+        Self {
+            name: disk.name().to_str().unwrap_or("").to_string(),
+            mount_point: disk.mount_point().to_str().unwrap_or("").to_string(),
+            total_space: disk.total_space(),
+            available_space: disk.available_space(),
+            is_removable: disk.is_removable(),
+        }
+    }
 }
 
 #[pymethods]

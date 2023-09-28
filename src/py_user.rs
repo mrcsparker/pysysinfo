@@ -1,4 +1,5 @@
 use pyo3::prelude::*;
+use sysinfo::UserExt;
 
 #[pyclass(name = "User")]
 pub struct PyUser {
@@ -13,6 +14,17 @@ pub struct PyUser {
 
     #[pyo3(get)]
     pub groups: Vec<String>,
+}
+
+impl From<&sysinfo::User> for PyUser {
+    fn from(user: &sysinfo::User) -> Self {
+        Self {
+            id: user.id().to_string(),
+            group_id: user.group_id().to_string(),
+            name: user.name().to_string(),
+            groups: user.groups().to_vec(),
+        }
+    }
 }
 
 #[pymethods]

@@ -1,4 +1,5 @@
 use pyo3::prelude::*;
+use sysinfo::{Component, ComponentExt};
 
 #[pyclass(name = "Component")]
 pub struct PyComponent {
@@ -13,6 +14,17 @@ pub struct PyComponent {
 
     #[pyo3(get)]
     pub label: String,
+}
+
+impl From<&sysinfo::Component> for PyComponent {
+    fn from(component: &sysinfo::Component) -> Self {
+        Self {
+            temperature: component.temperature(),
+            max: component.max(),
+            critical: component.critical(),
+            label: component.label().to_string(),
+        }
+    }
 }
 
 #[pymethods]
