@@ -1,20 +1,27 @@
 use pyo3::prelude::*;
+use serde::Serialize;
 use sysinfo::CpuExt;
 
+#[derive(Debug, Serialize)]
 #[pyclass(name = "Cpu")]
 pub struct PyCpu {
+    /// Returns this CPU's usage.
     #[pyo3(get)]
     pub cpu_usage: f32,
 
+    /// Returns this CPU's name.
     #[pyo3(get)]
     pub name: String,
 
+    /// Returns the CPU's vendor id.
     #[pyo3(get)]
     pub vendor_id: String,
 
+    /// Returns the CPU's brand.
     #[pyo3(get)]
     pub brand: String,
 
+    /// Returns the CPU's frequency.
     #[pyo3(get)]
     pub frequency: u64,
 }
@@ -31,12 +38,4 @@ impl From<&sysinfo::Cpu> for PyCpu {
     }
 }
 
-#[pymethods]
-impl PyCpu {
-    fn __repr__(&self) -> String {
-        format!(
-            "Cpu(cpu_usage={}, name={}, vendor_id={}, brand={}, frequency={})",
-            self.cpu_usage, self.name, self.vendor_id, self.brand, self.frequency
-        )
-    }
-}
+common_methods!(PyCpu);

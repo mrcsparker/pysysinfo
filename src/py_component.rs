@@ -1,17 +1,24 @@
 use pyo3::prelude::*;
-use sysinfo::{Component, ComponentExt};
+use serde::Serialize;
+use sysinfo::ComponentExt;
 
+/// Getting a component temperature information.
+#[derive(Debug, Serialize)]
 #[pyclass(name = "Component")]
 pub struct PyComponent {
+    /// Returns the temperature of the component (in celsius degree).
     #[pyo3(get)]
     pub temperature: f32,
 
+    /// Returns the maximum temperature of the component (in celsius degree).
     #[pyo3(get)]
     pub max: f32,
 
+    /// Returns the highest temperature before the component halts (in celsius degree).
     #[pyo3(get)]
     pub critical: Option<f32>,
 
+    /// Returns the label of the component.
     #[pyo3(get)]
     pub label: String,
 }
@@ -27,15 +34,4 @@ impl From<&sysinfo::Component> for PyComponent {
     }
 }
 
-#[pymethods]
-impl PyComponent {
-    fn __repr__(&self) -> String {
-        format!(
-            "Component(temperature={}, max={}, critical={}, label='{}')",
-            self.temperature,
-            self.max,
-            self.critical.unwrap_or(0.0),
-            self.label
-        )
-    }
-}
+common_methods!(PyComponent);

@@ -1,6 +1,7 @@
 use pyo3::prelude::*;
+use serde::Serialize;
 
-#[derive(Clone, Debug)]
+#[derive(Debug, Serialize)]
 #[pyclass(name = "LoadAvg")]
 pub struct PyLoadAvg {
     /// Average load within one minute.
@@ -16,8 +17,4 @@ pub struct PyLoadAvg {
     pub fifteen: f64,
 }
 
-impl PyLoadAvg {
-    fn __repr__(&self) -> String {
-        format!("{self:?}")
-    }
-}
+common_methods!(PyLoadAvg);

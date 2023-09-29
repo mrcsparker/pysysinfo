@@ -6,8 +6,7 @@ use crate::py_network::PyNetwork;
 use crate::py_user::PyUser;
 use pyo3::prelude::*;
 use rayon::prelude::*;
-use sysinfo::DiskExt;
-use sysinfo::{ComponentExt, CpuExt, NetworkExt, NetworksExt, System, SystemExt, UserExt};
+use sysinfo::{NetworkExt, NetworksExt, System, SystemExt};
 
 #[pyclass(name = "Sysinfo")]
 pub struct PySysinfo {
@@ -187,6 +186,7 @@ impl PySysinfo {
                 total_errors_on_received: network.total_errors_on_received(),
                 errors_on_transmitted: network.errors_on_transmitted(),
                 total_errors_on_transmitted: network.total_errors_on_transmitted(),
+                mac_address: network.mac_address().to_string(),
             })
             .collect()
     }
