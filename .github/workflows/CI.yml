@@ -286,12 +286,12 @@ jobs:
     if: "startsWith(github.ref, 'refs/tags/')"
     needs: [linux-wheels, windows-wheels, macos-wheels, sdist]
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: wheels-*
           path: dist
           merge-multiple: true
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: sdist
           path: dist
