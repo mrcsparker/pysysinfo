@@ -3,6 +3,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 .pytest_cache/
+.ruff_cache/
 *.py[cod]
 
 # C extensions
@@ -70,3 +71,10 @@ docs/_build/
 
 # Pyenv
 .python-version
+
+# Native extension copied into the mixed Python package by `maturin develop`
+python/pysysinfo/_core*.so
+python/pysysinfo/_core*.pyd
+python/pysysinfo/_core*.dylib
+python/pysysinfo/*.dSYM
+python/pysysinfo/*.dSYM/
