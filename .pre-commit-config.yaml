@@ -1,0 +1,43 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.2
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo fmt --all --check
+        entry: cargo fmt --all --check
+        language: system
+        pass_filenames: false
+        types_or: [rust]
+      - id: cargo-clippy
+        name: cargo clippy --all-targets -- -D warnings
+        entry: cargo clippy --all-targets -- -D warnings
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+      - id: mypy
+        name: uv run mypy tests examples
+        entry: uv run mypy tests examples
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+      - id: pytest
+        name: uv run pytest
+        entry: uv run pytest
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

@@ -5,7 +5,13 @@ edition = "2024"
 rust-version = "1.88"
 description = "Python-friendly Rust bindings for sysinfo"
 license = "MIT"
+authors = ["mrcsparker"]
+homepage = "https://github.com/mrcsparker/pysysinfo"
 repository = "https://github.com/mrcsparker/pysysinfo"
+documentation = "https://mrcsparker.github.io/pysysinfo/"
+readme = "README.md"
+keywords = ["python", "pyo3", "sysinfo", "monitoring", "ffi"]
+categories = ["api-bindings", "development-tools::ffi", "os"]
 
 [lib]
 name = "pysysinfo"

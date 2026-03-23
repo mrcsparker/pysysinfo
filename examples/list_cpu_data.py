@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import time
 
-from pysysinfo import MINIMUM_CPU_UPDATE_INTERVAL, System
+from pysysinfo import MINIMUM_CPU_UPDATE_INTERVAL, Sysinfo
 
 
 def main() -> None:
-    system = System.new_empty()
+    system = Sysinfo.new_empty()
 
     # Build the CPU list, fetch frequency data, then prime the diff-based usage counters.
     system.refresh_cpu_list(cpu_usage=False, frequency=True)

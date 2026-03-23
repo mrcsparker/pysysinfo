@@ -1,0 +1,40 @@
+name: Audit
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+          enable-cache: true
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install cargo-audit
+        uses: taiki-e/install-action@cargo-audit
+      - name: Sync development dependencies
+        run: uv sync --group dev
+      - name: Audit Rust dependencies
+        run: cargo audit
+      - name: Export locked Python dependencies
+        run: uv export --group dev --format requirements-txt --no-hashes -o audit-requirements.txt
+      - name: Audit Python dependencies
+        run: uv run pip-audit -r audit-requirements.txt

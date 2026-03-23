@@ -17,7 +17,7 @@ use crate::sysconv::{
     process_status_to_string, thread_kind_to_string,
 };
 
-/// Immutable snapshot of a process, with live control methods backed by the owning `System`.
+/// Immutable snapshot of a process, with live control methods backed by the owning `Sysinfo`.
 #[derive(Clone, Debug, Serialize)]
 #[pyclass(name = "Process", module = "pysysinfo", frozen, skip_from_py_object)]
 pub struct PyProcess {
@@ -135,7 +135,7 @@ impl PyProcess {
         }
     }
 
-    /// Resolve this snapshot back to a live `sysinfo::Process` owned by the parent `System`.
+    /// Resolve this snapshot back to a live `sysinfo::Process` owned by the parent `Sysinfo`.
     ///
     /// The extra `start_time` check guards against PID reuse so live control
     /// operations cannot silently act on a different process than the one this
@@ -148,7 +148,7 @@ impl PyProcess {
         let pid = sysinfo::Pid::from_u32(self.pid);
         let process = state.system.process(pid).ok_or_else(|| {
             PyLookupError::new_err(format!(
-                "process {} is no longer available in the owning System snapshot",
+                "process {} is no longer available in the owning Sysinfo snapshot",
                 self.pid
             ))
         })?;

@@ -10,7 +10,9 @@ import pytest
 
 
 def test_import_surface() -> None:
+    assert pysysinfo.Sysinfo.__module__ == "pysysinfo"
     assert pysysinfo.System.__module__ == "pysysinfo"
+    assert pysysinfo.System is pysysinfo.Sysinfo
     assert pysysinfo.Process.__module__ == "pysysinfo"
     assert pysysinfo.Group.__module__ == "pysysinfo"
     assert pysysinfo.DiskUsage.__module__ == "pysysinfo"
@@ -22,7 +24,7 @@ def test_import_surface() -> None:
 
 
 def test_system_properties_are_immutable_tuples() -> None:
-    system = pysysinfo.System()
+    system = pysysinfo.Sysinfo()
 
     assert isinstance(system.cpus, tuple)
     assert isinstance(system.disks, tuple)
@@ -36,7 +38,7 @@ def test_system_properties_are_immutable_tuples() -> None:
 
 
 def test_refresh_methods_keep_the_system_usable() -> None:
-    system = pysysinfo.System.new_empty()
+    system = pysysinfo.Sysinfo.new_empty()
 
     system.refresh_memory()
     system.refresh_memory_specifics(ram=True, swap=False)
@@ -90,7 +92,7 @@ def test_refresh_methods_keep_the_system_usable() -> None:
 
 
 def test_to_dict_and_to_json_round_trip() -> None:
-    system = pysysinfo.System()
+    system = pysysinfo.Sysinfo()
 
     as_dict = system.to_dict()
     as_json = json.loads(system.to_json())
@@ -105,9 +107,9 @@ def test_to_dict_and_to_json_round_trip() -> None:
 
 
 def test_nested_snapshot_objects_are_readable_and_frozen() -> None:
-    system = pysysinfo.System()
+    system = pysysinfo.Sysinfo()
 
-    assert repr(system).startswith("System(")
+    assert repr(system).startswith("Sysinfo(")
 
     if system.cpus:
         cpu = system.cpus[0]
@@ -157,7 +159,7 @@ def test_process_lookup_and_control() -> None:
     )
 
     try:
-        system = pysysinfo.System.new_empty()
+        system = pysysinfo.Sysinfo.new_empty()
         updated = system.refresh_processes_specifics(
             [child.pid],
             True,
@@ -191,14 +193,14 @@ def test_process_lookup_and_control() -> None:
 
 
 def test_user_lookup_and_public_docstrings_are_present() -> None:
-    system = pysysinfo.System()
+    system = pysysinfo.Sysinfo()
 
     if system.users:
         resolved = system.get_user_by_id(system.users[0].id)
         assert resolved is not None
         assert resolved.id == system.users[0].id
 
-    assert pysysinfo.System.__doc__
-    assert pysysinfo.System.refresh_processes_specifics.__doc__
+    assert pysysinfo.Sysinfo.__doc__
+    assert pysysinfo.Sysinfo.refresh_processes_specifics.__doc__
     assert pysysinfo.Process.kill_and_wait.__doc__
     assert pysysinfo.Product.to_dict.__doc__

@@ -1,13 +1,15 @@
 # API Reference
 
 This document covers the public Python API exported by `pysysinfo`.
-For runnable examples, see the scripts in [`examples/`](../examples).
+For runnable examples, see the
+[`examples/` directory on GitHub](https://github.com/mrcsparker/pysysinfo/tree/main/examples).
 
 ## Top-Level Exports
 
 ### Classes
 
-- `System`
+- `Sysinfo`
+- `System` (compatibility alias for `Sysinfo`)
 - `Cpu`
 - `Disk`
 - `DiskUsage`
@@ -36,23 +38,26 @@ For runnable examples, see the scripts in [`examples/`](../examples).
 - `MINIMUM_CPU_UPDATE_INTERVAL: float`
 - `__version__: str`
 
-## System
+## Sysinfo
 
-`System` is the main entry point.
+`Sysinfo` is the main entry point.
 It owns the live `sysinfo` collectors and produces immutable Python snapshot
 objects from that state.
 
+`System` remains available as a compatibility alias, but new code should prefer
+`Sysinfo`.
+
 ### Construction
 
-- `System()`
+- `Sysinfo()`
   Creates a fully initialized system snapshot using the same broad defaults as
   `sysinfo::System::new_all()`.
 
-- `System.new_empty()`
-  Creates a `System` with no initial data loaded.
+- `Sysinfo.new_empty()`
+  Creates a `Sysinfo` collector with no initial data loaded.
   This is useful when you want tight control over the initial refresh cost.
 
-- `System.new_with_specifics(...)`
+- `Sysinfo.new_with_specifics(...)`
   Creates an empty system and immediately applies a selective refresh.
   The refresh parameters mirror the Python `refresh_specifics(...)` method.
 
@@ -331,7 +336,7 @@ Methods:
 ## Process and ExitStatus
 
 `Process` snapshots are immutable, but their lifecycle methods remain live.
-They operate against the owning `System` state.
+They operate against the owning `Sysinfo` state.
 
 If the process disappears or the PID has been reused for a different process,
 control methods raise a lookup-style Python exception instead of silently acting

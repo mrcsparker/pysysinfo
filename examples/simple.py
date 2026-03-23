@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import time
 
-from pysysinfo import MINIMUM_CPU_UPDATE_INTERVAL, System, get_current_pid
+from pysysinfo import MINIMUM_CPU_UPDATE_INTERVAL, Sysinfo, get_current_pid
 
 
 def main() -> None:
-    system = System()
+    system = Sysinfo()
 
     print("== package constants ==")
     print(f"minimum cpu update interval: {MINIMUM_CPU_UPDATE_INTERVAL:.3f}s")

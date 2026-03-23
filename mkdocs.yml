@@ -1,0 +1,29 @@
+site_name: pysysinfo
+site_description: Python-first sysinfo bindings built with Rust, PyO3, uv, and maturin.
+site_url: https://mrcsparker.github.io/pysysinfo/
+repo_url: https://github.com/mrcsparker/pysysinfo
+repo_name: mrcsparker/pysysinfo
+edit_uri: edit/main/
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: readthedocs
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - codehilite
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Overview: index.md
+  - API Reference: api.md
+  - Changelog: changelog.md
+  - Contributing: contributing.md
+  - Security: security.md

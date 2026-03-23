@@ -1,4 +1,4 @@
-//! Python-facing `System` facade and the bulk of the public binding surface.
+//! Python-facing `Sysinfo` facade and the bulk of the public binding surface.
 
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyTuple, PyType};
@@ -38,18 +38,18 @@ struct RefreshSpecificsRequest {
 
 /// Python-first facade over the Rust `sysinfo` collectors.
 #[derive(Debug)]
-#[pyclass(name = "System", module = "pysysinfo")]
-pub struct PySystem {
+#[pyclass(name = "Sysinfo", module = "pysysinfo")]
+pub struct PySysinfo {
     state: SharedState,
 }
 
-impl Default for PySystem {
+impl Default for PySysinfo {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl PySystem {
+impl PySysinfo {
     /// Wrap a freshly constructed `SystemState` inside the shared lock used by Python objects.
     fn from_state(state: SystemState) -> Self {
         Self {
@@ -110,14 +110,14 @@ impl PySystem {
 }
 
 #[pymethods]
-impl PySystem {
-    /// Create a new `System` with an initial full snapshot already loaded.
+impl PySysinfo {
+    /// Create a new `Sysinfo` collector with an initial full snapshot already loaded.
     #[new]
     pub fn new() -> Self {
         Self::from_state(SystemState::new())
     }
 
-    /// Create a `System` with nothing preloaded.
+    /// Create a `Sysinfo` collector with nothing preloaded.
     ///
     /// This is useful when callers want explicit control over which collectors are
     /// refreshed first and when that work happens.
@@ -126,7 +126,7 @@ impl PySystem {
         Self::new_empty_internal()
     }
 
-    /// Create a `System` with explicit refresh controls similar to
+    /// Create a `Sysinfo` collector with explicit refresh controls similar to
     /// `sysinfo::System::new_with_specifics`.
     ///
     /// The `process_*` keyword arguments use the string values `"never"`,
@@ -203,7 +203,7 @@ impl PySystem {
         Ok(system)
     }
 
-    /// Refresh every collector owned by this `System`.
+    /// Refresh every collector owned by this `Sysinfo`.
     pub fn refresh_all(&self) -> PyResult<()> {
         self.with_state_mut(|state| state.refresh_all())
     }
@@ -657,7 +657,7 @@ impl PySystem {
     /// Return the process with the given PID, if present.
     ///
     /// The returned `Process` is an immutable snapshot with live control methods
-    /// that still talk to this owning `System`.
+    /// that still talk to this owning `Sysinfo`.
     fn process<'py>(&self, py: Python<'py>, pid: u32) -> PyResult<Option<Py<PyProcess>>> {
         let process = self.with_state(|state| state.process(pid, self.state.clone()))?;
         process.map(|process| Py::new(py, process)).transpose()
@@ -715,7 +715,7 @@ impl PySystem {
     fn __repr__(&self) -> PyResult<String> {
         let counts = self.with_state(|state| state.collection_counts())?;
         Ok(format!(
-            "System(name={}, cpus={}, disks={}, networks={}, components={}, users={}, groups={}, processes={})",
+            "Sysinfo(name={}, cpus={}, disks={}, networks={}, components={}, users={}, groups={}, processes={})",
             repr_optional_string(&sysinfo::System::name()),
             counts.cpus,
             counts.disks,
@@ -737,14 +737,14 @@ fn repr_optional_string(value: &Option<String>) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::PySystem;
+    use super::PySysinfo;
 
     #[test]
     fn repr_is_readable() {
-        let system = PySystem::new();
+        let system = PySysinfo::new();
         let repr = system.__repr__().unwrap();
 
-        assert!(repr.starts_with("System("));
+        assert!(repr.starts_with("Sysinfo("));
         assert!(repr.contains("groups="));
         assert!(repr.contains("processes="));
     }

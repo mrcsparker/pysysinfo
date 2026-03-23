@@ -3,14 +3,14 @@ from __future__ import annotations
 import json
 from pprint import pprint
 
-from pysysinfo import System, get_current_pid, set_open_files_limit
+from pysysinfo import Sysinfo, get_current_pid, set_open_files_limit
 
 
 def main() -> None:
     print("== construction ==")
-    full = System()
-    empty = System.new_empty()
-    selective = System.new_with_specifics(
+    full = Sysinfo()
+    empty = Sysinfo.new_empty()
+    selective = Sysinfo.new_with_specifics(
         memory=True,
         cpu=True,
         cpu_usage=True,

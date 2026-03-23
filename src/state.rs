@@ -13,10 +13,10 @@ use crate::data::{
 };
 use crate::process::PyProcess;
 
-/// Shared owner for the live collectors backing `System` and any live `Process` objects.
+/// Shared owner for the live collectors backing `Sysinfo` and any live `Process` objects.
 pub(crate) type SharedState = Arc<Mutex<SystemState>>;
 
-/// Parsed options for `System.refresh_processes_specifics`.
+/// Parsed options for `Sysinfo.refresh_processes_specifics`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct ProcessRefreshOptions {
     pub(crate) cpu: bool,
@@ -84,7 +84,7 @@ impl std::fmt::Debug for SystemState {
     }
 }
 
-/// Serializable whole-system snapshot used by `System.to_dict()` and `System.to_json()`.
+/// Serializable whole-system snapshot used by `Sysinfo.to_dict()` and `Sysinfo.to_json()`.
 #[derive(Clone, Debug, Serialize)]
 pub(crate) struct SystemSnapshot {
     pub(crate) total_memory: u64,
@@ -139,7 +139,7 @@ impl Default for SystemState {
 }
 
 impl SystemState {
-    /// Create a state with broad, eager refreshes so the default `System()` is immediately useful.
+    /// Create a state with broad, eager refreshes so the default `Sysinfo()` is immediately useful.
     pub(crate) fn new() -> Self {
         Self {
             system: sysinfo::System::new_all(),
@@ -472,7 +472,7 @@ impl SystemState {
         }
     }
 
-    /// Build the deterministic, serialization-friendly snapshot used by `System.to_dict()`.
+    /// Build the deterministic, serialization-friendly snapshot used by `Sysinfo.to_dict()`.
     pub(crate) fn snapshot(&self, shared: SharedState) -> SystemSnapshot {
         SystemSnapshot {
             total_memory: self.system.total_memory(),
@@ -510,7 +510,7 @@ impl SystemState {
         }
     }
 
-    /// Return just the collection counts used by `System.__repr__`.
+    /// Return just the collection counts used by `Sysinfo.__repr__`.
     pub(crate) fn collection_counts(&self) -> CollectionCounts {
         CollectionCounts {
             cpus: self.system.cpus().len(),

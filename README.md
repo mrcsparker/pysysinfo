@@ -6,11 +6,19 @@ It focuses on a clean Python API, immutable snapshot objects, modern packaging
 with `uv` + `maturin`, and full access to the useful parts of `sysinfo`
 without feeling like a raw port of the Rust API.
 
+Project links:
+
+- Documentation site: [mrcsparker.github.io/pysysinfo](https://mrcsparker.github.io/pysysinfo/)
+- API reference: [docs/api.md](docs/api.md)
+- Changelog: [CHANGELOG.md](CHANGELOG.md)
+- Contributing guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Security policy: [SECURITY.md](SECURITY.md)
+
 ## Highlights
 
-- A single `System` entry point with immediate, usable data
+- A single `Sysinfo` entry point with immediate, usable data
 - Immutable snapshot objects such as `Cpu`, `Disk`, `Network`, `User`, and `Process`
-- Live process-control helpers backed by the owning `System`
+- Live process-control helpers backed by the owning `Sysinfo`
 - Friendly serialization helpers with `to_dict()` and `to_json()`
 - Fine-grained refresh controls for memory, CPU, processes, disks, and more
 - Typed Python package layout with `py.typed` and a full stub file
@@ -22,9 +30,9 @@ from __future__ import annotations
 
 import time
 
-from pysysinfo import MINIMUM_CPU_UPDATE_INTERVAL, System, get_current_pid
+from pysysinfo import MINIMUM_CPU_UPDATE_INTERVAL, Sysinfo, get_current_pid
 
-system = System()
+system = Sysinfo()
 
 print(system)
 print(f"Host: {system.host_name}")
@@ -49,6 +57,7 @@ print(f"Serialized system snapshot size: {len(system.to_json())} bytes")
 
 ## Documentation
 
+- Documentation site: [mrcsparker.github.io/pysysinfo](https://mrcsparker.github.io/pysysinfo/)
 - API reference: [docs/api.md](docs/api.md)
 - Examples: [examples/](examples)
 
@@ -74,6 +83,7 @@ from pysysinfo import (
     Network,
     Process,
     Product,
+    Sysinfo,
     System,
     User,
     get_current_pid,
@@ -81,7 +91,7 @@ from pysysinfo import (
 )
 ```
 
-`System` exposes:
+`Sysinfo` exposes:
 
 - Snapshot properties: `cpus`, `disks`, `networks`, `components`, `users`, `groups`, `processes`
 - Memory properties: `total_memory`, `free_memory`, `available_memory`, `used_memory`, `total_swap`, `free_swap`, `used_swap`, `cgroup_limits`
@@ -113,25 +123,33 @@ Accepted refresh-update strings for process-specific refresh controls are:
 
 ```bash
 uv sync --group dev
+pre-commit install --hook-type pre-commit --hook-type pre-push
 uv run maturin develop
 uv run cargo test --all-targets
 uv run pytest
+uv run pytest --cov=pysysinfo --cov-report=term-missing
+uv run mypy tests examples
 uv run ruff check .
+cargo fmt --check
+uv run mkdocs serve
 cargo clippy --all-targets -- -D warnings
 ```
 
 `uv` owns the Python environment and lockfile.
 `maturin` builds and installs the native extension into the mixed Python
 package under `python/pysysinfo`.
+`pre-commit` keeps the fast formatting and lint hooks close to the edit loop,
+while CI covers the heavier matrix, coverage, packaging, documentation, and
+security checks.
 
 ## Migration From `Sysinfo`
 
 This release intentionally breaks the old API.
 
-- `pysysinfo.Sysinfo` was replaced with `pysysinfo.System`
+- `pysysinfo.Sysinfo` is the primary entry point again
+- `pysysinfo.System` remains available as a compatibility alias
 - `system.cpus()` became `system.cpus`
 - `system.disks()` became `system.disks`
 - `system.networks()` became `system.networks`
 - `system.components()` became `system.components`
 - `system.users()` became `system.users`
-- There is no compatibility alias for `Sysinfo`

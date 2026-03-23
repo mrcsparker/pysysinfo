@@ -4,6 +4,8 @@
 __pycache__/
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
+.pre-commit-cache/
 *.py[cod]
 
 # C extensions
@@ -39,9 +41,12 @@ pip-selfcheck.json
 htmlcov/
 .tox/
 .coverage
+.coverage.*
 .cache
 nosetests.xml
 coverage.xml
+python-coverage.xml
+rust-coverage.lcov
 
 # Translations
 *.mo
@@ -62,6 +67,7 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+site/
 
 # PyCharm
 .idea/

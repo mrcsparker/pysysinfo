@@ -1,7 +1,7 @@
 """Python-first bindings for the Rust `sysinfo` crate.
 
-The public API centers on :class:`System`, which keeps a modern, Pythonic facade
-while still covering the broader `sysinfo` surface:
+The public API centers on :class:`Sysinfo`, which keeps a modern, Pythonic
+facade while still covering the broader `sysinfo` surface:
 
 - immutable snapshots for CPUs, disks, networks, users, groups, processes, and sensors
 - explicit refresh controls for memory, CPU, disks, and processes
@@ -32,7 +32,7 @@ try:
         Network,
         Process,
         Product,
-        System,
+        Sysinfo,
         User,
         get_current_pid,
         set_open_files_limit,
@@ -47,6 +47,8 @@ try:
     __version__ = version("pysysinfo")
 except PackageNotFoundError:  # pragma: no cover - editable dev installs without metadata are rare
     __version__ = "0.0.0"
+
+System = Sysinfo
 
 __all__ = [
     "CGroupLimits",
@@ -66,6 +68,7 @@ __all__ = [
     "Process",
     "Product",
     "SUPPORTED_SIGNALS",
+    "Sysinfo",
     "System",
     "User",
     "__version__",

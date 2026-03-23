@@ -9,6 +9,8 @@ description = "A polished, Python-first wrapper around the Rust sysinfo crate."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
+authors = [{ name = "mrcsparker" }]
+maintainers = [{ name = "mrcsparker" }]
 keywords = ["sysinfo", "system", "monitoring", "pyo3", "rust"]
 dependencies = []
 classifiers = [
@@ -29,9 +31,20 @@ classifiers = [
     "Typing :: Typed",
 ]
 
+[project.urls]
+Homepage = "https://github.com/mrcsparker/pysysinfo"
+Documentation = "https://mrcsparker.github.io/pysysinfo/"
+Repository = "https://github.com/mrcsparker/pysysinfo"
+Issues = "https://github.com/mrcsparker/pysysinfo/issues"
+Changelog = "https://github.com/mrcsparker/pysysinfo/blob/main/CHANGELOG.md"
+
 [dependency-groups]
 dev = [
     "maturin>=1.12,<2.0",
+    "mkdocs>=1.6.1,<2.0.0",
+    "mypy>=1.16.1,<2.0.0",
+    "pip-audit>=2.9.0,<3.0.0",
+    "pre-commit>=4.2.0,<5.0.0",
     "pytest>=8.3.5,<9.0.0",
     "pytest-cov>=6.1.1,<7.0.0",
     "ruff>=0.11.2,<0.12.0",
@@ -44,6 +57,23 @@ module-name = "pysysinfo._core"
 [tool.pytest.ini_options]
 addopts = "-ra"
 testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["pysysinfo"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+[tool.mypy]
+python_version = "3.10"
+files = ["tests", "examples"]
+pretty = true
+show_error_codes = true
+warn_unused_configs = true
+warn_unused_ignores = true
+strict = true
 
 [tool.ruff]
 line-length = 100

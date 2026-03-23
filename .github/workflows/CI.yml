@@ -36,10 +36,30 @@ jobs:
         run: cargo clippy --all-targets -- -D warnings
       - name: Lint Python
         run: uv run ruff check .
+      - name: Check Python formatting
+        run: uv run ruff format --check .
+      - name: Build extension for type-checking
+        run: uv run maturin develop
+      - name: Type-check examples and tests
+        run: uv run mypy tests examples
+
+  msrv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install Rust MSRV
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.88.0"
+      - name: Verify the declared MSRV builds
+        run: cargo check --all-targets
 
   test:
     name: test (${{ matrix.os }}, py${{ matrix.python-version }})
-    needs: lint
+    needs: [lint, msrv]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -74,9 +94,104 @@ jobs:
       - name: Run Python tests
         run: uv run pytest
 
+  examples:
+    name: examples (ubuntu, py3.13)
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+          enable-cache: true
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Sync development dependencies
+        run: uv sync --group dev
+      - name: Build extension in the uv environment
+        run: uv run maturin develop
+      - name: Run example scripts
+        run: |
+          uv run python examples/simple.py
+          uv run python examples/list_cpu_data.py
+          uv run python examples/list_resources.py
+          uv run python examples/sysinfo.py
+          uv run python examples/process_control.py
+
+  coverage:
+    name: coverage (ubuntu, py3.13)
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+          enable-cache: true
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Sync development dependencies
+        run: uv sync --group dev
+      - name: Build extension in the uv environment
+        run: uv run maturin develop
+      - name: Collect Python coverage
+        run: uv run pytest --cov=pysysinfo --cov-report=term-missing --cov-report=xml:python-coverage.xml
+      - name: Collect Rust coverage
+        run: uv run cargo llvm-cov --all-targets --lcov --output-path rust-coverage.lcov
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            python-coverage.xml
+            rust-coverage.lcov
+
+  package-smoke:
+    name: package smoke (ubuntu, py3.13)
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+          enable-cache: true
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Sync development dependencies
+        run: uv sync --group dev
+      - name: Build wheel and sdist
+        run: uv run maturin build --release --sdist --find-interpreter --out dist
+      - name: Create isolated wheel test environment
+        run: uv venv .venv-wheel-smoke --python 3.13
+      - name: Install wheel
+        run: uv pip install --python .venv-wheel-smoke/bin/python dist/*.whl
+      - name: Smoke-test installed wheel
+        run: ./.venv-wheel-smoke/bin/python -c "from pysysinfo import Sysinfo; system = Sysinfo(); print(system.host_name)"
+      - name: Create isolated sdist test environment
+        run: uv venv .venv-sdist-smoke --python 3.13
+      - name: Install sdist
+        run: uv pip install --python .venv-sdist-smoke/bin/python dist/*.tar.gz
+      - name: Smoke-test installed sdist
+        run: ./.venv-sdist-smoke/bin/python -c "from pysysinfo import Sysinfo; system = Sysinfo(); print(system.host_name)"
+
   linux-wheels:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: test
+    needs: [test, examples, package-smoke]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -101,7 +216,7 @@ jobs:
 
   windows-wheels:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: test
+    needs: [test, examples, package-smoke]
     runs-on: windows-latest
     strategy:
       matrix:
@@ -126,7 +241,7 @@ jobs:
 
   macos-wheels:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: test
+    needs: [test, examples, package-smoke]
     runs-on: macos-latest
     strategy:
       matrix:
@@ -150,7 +265,7 @@ jobs:
 
   sdist:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: test
+    needs: [test, examples, package-smoke]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

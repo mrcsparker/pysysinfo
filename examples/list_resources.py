@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pysysinfo import System
+from pysysinfo import Sysinfo
 
 
 def preview_strings(values: list[str], limit: int = 5) -> str:
@@ -10,7 +10,7 @@ def preview_strings(values: list[str], limit: int = 5) -> str:
 
 
 def main() -> None:
-    system = System()
+    system = Sysinfo()
 
     print("== disks ==")
     for disk in system.disks:

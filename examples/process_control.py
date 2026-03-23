@@ -4,7 +4,7 @@ import subprocess
 import sys
 from contextlib import suppress
 
-from pysysinfo import System
+from pysysinfo import Process, Sysinfo
 
 
 def spawn_sleeping_child(seconds: float) -> subprocess.Popen[str]:
@@ -16,7 +16,7 @@ def spawn_sleeping_child(seconds: float) -> subprocess.Popen[str]:
     )
 
 
-def refresh_process(system: System, pid: int):
+def refresh_process(system: Sysinfo, pid: int) -> Process | None:
     system.refresh_processes_specifics(
         [pid],
         True,
@@ -43,7 +43,7 @@ def wait_and_cleanup(child: subprocess.Popen[str]) -> None:
 
 
 def main() -> None:
-    system = System.new_empty()
+    system = Sysinfo.new_empty()
 
     print("== wait() on a naturally exiting child ==")
     child = spawn_sleeping_child(0.5)

@@ -14,7 +14,7 @@ use data::{
 use process::{PyExitStatus, PyProcess};
 use pyo3::prelude::*;
 use pyo3::types::PyTuple;
-use system::PySystem;
+use system::PySysinfo;
 
 use crate::sysconv::supported_signals;
 
@@ -54,7 +54,7 @@ fn pysysinfo_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyNetwork>()?;
     m.add_class::<PyProcess>()?;
     m.add_class::<PyProduct>()?;
-    m.add_class::<PySystem>()?;
+    m.add_class::<PySysinfo>()?;
     m.add_class::<PyUser>()?;
     m.add_function(wrap_pyfunction!(get_current_pid, m)?)?;
     m.add_function(wrap_pyfunction!(set_open_files_limit, m)?)?;
