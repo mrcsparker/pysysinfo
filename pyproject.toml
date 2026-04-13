@@ -1,5 +1,5 @@
 [build-system]
-requires = ["maturin>=1.12,<2.0"]
+requires = ["maturin>=1.13.1,<2.0"]
 build-backend = "maturin"
 
 [project]
@@ -40,7 +40,7 @@ Changelog = "https://github.com/mrcsparker/pysysinfo/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
-    "maturin>=1.12,<2.0",
+    "maturin>=1.13.1,<2.0",
     "mkdocs>=1.6.1,<2.0.0",
     "mypy>=1.16.1,<2.0.0",
     "pip-audit>=2.9.0,<3.0.0",
